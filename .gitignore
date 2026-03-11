@@ -1,0 +1,31 @@
+# Gabarito do avaliador - NÃO comitar
+GABARITO_AVALIADOR.md
+
+# Backend
+backend/target/
+backend/.idea/
+backend/*.iml
+backend/.settings/
+backend/.project
+backend/.classpath
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+
+# Docker
+postgres_data/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+*.env.local
