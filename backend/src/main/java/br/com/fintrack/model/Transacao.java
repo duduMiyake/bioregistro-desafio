@@ -1,6 +1,6 @@
 package br.com.fintrack.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -9,7 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transacao")
-public class Transacao extends PanacheEntity {
+public class Transacao extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
 
     @NotBlank(message = "Descrição é obrigatória")
     @Size(min = 3, max = 255, message = "Descrição deve ter entre 3 e 255 caracteres")
