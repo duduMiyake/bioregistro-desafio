@@ -120,9 +120,9 @@ public class TransacaoService {
 
         for (Transacao t : todas) {
             if (t.tipo == TipoTransacao.RECEITA) {
-                totalDespesas = totalDespesas.add(t.valor);
-            } else {
                 totalReceitas = totalReceitas.add(t.valor);
+            } else {
+                totalDespesas = totalDespesas.add(t.valor);
             }
         }
 
