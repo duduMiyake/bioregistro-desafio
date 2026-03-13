@@ -89,6 +89,7 @@ public class TransacaoService {
         return toDTO(transacao);
     }
 
+    @Transactional
     public void deletar(Long id) {
         Transacao transacao = transacaoRepository.findById(id);
         if (transacao == null) {
