@@ -11,7 +11,7 @@ import java.util.List;
 public class TransacaoRepository implements PanacheRepository<Transacao> {
 
     public List<Transacao> findByPeriodo(LocalDate dataInicio, LocalDate dataFim) {
-        return list("data >= ?1 AND data <= ?2", dataFim, dataInicio);
+        return list("data >= ?1 AND data <= ?2", dataInicio, dataFim);
     }
 
     public List<Transacao> findByCategoria(Long categoriaId) {
