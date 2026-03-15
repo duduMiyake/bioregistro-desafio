@@ -90,6 +90,8 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 100;
+  transition: var(--transition);
+  transform: translateX(0);
 }
 
 .sidebar-logo {
@@ -318,6 +320,11 @@ body {
   font-size: 0.8rem;
 }
 
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none;
+}
+
 /* Forms */
 .form-group {
   margin-bottom: 1.25rem;
@@ -362,7 +369,8 @@ select.form-control {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .table {
@@ -577,17 +585,27 @@ select.form-control {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    flex-direction: row;
-    padding: 1rem;
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 1.25rem;
+    transform: translateX(-100%);
   }
   
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
   .sidebar-nav {
-    flex-direction: row;
-    overflow-x: auto;
+    flex-direction: column;
+    overflow-x: visible;
   }
   
   .main-content {
@@ -608,6 +626,25 @@ select.form-control {
     align-items: flex-start;
     gap: 1rem;
   }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .mobile-menu-btn svg {
+    font-size: 1.2rem;
+  }
 }
 
 /* Chart container */
@@ -623,6 +660,19 @@ select.form-control {
   margin-bottom: 1rem;
   font-size: 1.1rem;
   color: var(--text-secondary);
+}
+
+/* Charts grid (dashboard) */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Toastify override */

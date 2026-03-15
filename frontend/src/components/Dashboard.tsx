@@ -120,7 +120,7 @@ function Dashboard() {
             </div>
 
             {/* Charts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className="charts-grid">
                 <div className="chart-container">
                     <h3>Despesas por Categoria</h3>
                     {getDadosGraficoPizza().length > 0 ? (
