@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.util.List;
 
-@Path("/api/transacoes")
+@Path("/api/transacao")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TransacaoController {

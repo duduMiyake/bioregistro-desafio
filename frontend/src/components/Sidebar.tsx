@@ -5,6 +5,7 @@ type Page = 'dashboard' | 'transacoes' | 'categorias'
 interface SidebarProps {
     currentPage: Page
     onNavigate: (page: Page) => void
+    isOpen: boolean
 }
 
 interface MenuItem {
@@ -13,7 +14,7 @@ interface MenuItem {
     icon: React.ReactNode
 }
 
-function Sidebar({ currentPage, onNavigate }: SidebarProps) {
+function Sidebar({ currentPage, onNavigate, isOpen }: SidebarProps) {
     const menuItems: MenuItem[] = [
         { id: 'dashboard', label: 'Dashboard', icon: <FiHome /> },
         { id: 'transacoes', label: 'Transações', icon: <FiDollarSign /> },
@@ -21,7 +22,7 @@ function Sidebar({ currentPage, onNavigate }: SidebarProps) {
     ]
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'open' : 'collapsed'}`}>
             <div className="sidebar-logo">
                 <div className="logo-icon">
                     <FiTrendingUp />

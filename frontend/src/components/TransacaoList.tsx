@@ -27,12 +27,18 @@ function TransacaoList() {
     const [filtroCategoria, setFiltroCategoria] = useState<string>('')
     const [filtroDataInicio, setFiltroDataInicio] = useState<string>('')
     const [filtroDataFim, setFiltroDataFim] = useState<string>('')
+    const [paginaAtual, setPaginaAtual] = useState<number>(0)
+    const [itensPorPagina, setItensPorPagina] = useState<number>(10)
 
     const [form, setForm] = useState<TransacaoFormData>(FORM_INITIAL_STATE)
 
     useEffect(() => {
         carregarDados()
     }, [])
+
+    useEffect(() => {
+        setPaginaAtual(0)
+    }, [filtroCategoria, filtroDataInicio, filtroDataFim, itensPorPagina])
 
     const carregarDados = async (): Promise<void> => {
         try {
@@ -126,6 +132,23 @@ function TransacaoList() {
         return true
     })
 
+    const totalPaginas = Math.ceil(transacoesFiltradas.length / itensPorPagina)
+
+    useEffect(() => {
+        if (totalPaginas > 0 && paginaAtual > totalPaginas - 1) {
+            setPaginaAtual(totalPaginas - 1)
+        }
+    }, [paginaAtual, totalPaginas])
+
+    const indiceInicial = paginaAtual * itensPorPagina
+    const indiceFinal = indiceInicial + itensPorPagina
+
+    const transacoesPaginadas = transacoesFiltradas.slice(indiceInicial, indiceFinal)
+
+    const totalElementos = transacoesFiltradas.length
+    const inicioAtual = totalElementos === 0 ? 0 : indiceInicial + 1
+    const fimAtual = Math.min(indiceFinal, totalElementos)
+
     const limparFiltros = (): void => {
         setFiltroCategoria('')
         setFiltroDataInicio('')
@@ -208,7 +231,7 @@ function TransacaoList() {
                             </tr>
                         </thead>
                         <tbody>
-                            {transacoesFiltradas.map((t) => (
+                            {transacoesPaginadas.map((t) => (
                                 <tr key={t.id}>
                                     <td>{t.descricao}</td>
                                     <td style={{ fontWeight: 600 }}>
@@ -245,6 +268,75 @@ function TransacaoList() {
                     <div className="empty-icon">💸</div>
                     <h3>Nenhuma transação encontrada</h3>
                     <p>Adicione sua primeira transação clicando no botão acima</p>
+                </div>
+            )}
+
+            {transacoesFiltradas.length > 0 && (
+                <div className="pagination">
+                    <div className="pagination-left">
+                        <div className="pagination-page-size">
+                            <label htmlFor="itensPorPagina">Itens por página</label>
+                            <select
+                                id="itensPorPagina"
+                                className="form-control pagination-select"
+                                value={itensPorPagina}
+                                onChange={(e) => setItensPorPagina(Number(e.target.value))}
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+
+                        <div className="pagination-info">
+                            Mostrando {inicioAtual} a {fimAtual} de {totalElementos} transações
+                        </div>
+                    </div>
+
+                    <div className="pagination-controls">
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setPaginaAtual(0)}
+                            disabled={paginaAtual === 0}
+                        >
+                            «
+                        </button>
+
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setPaginaAtual((prev) => Math.max(prev - 1, 0))}
+                            disabled={paginaAtual === 0}
+                        >
+                            ‹
+                        </button>
+
+                        {Array.from({ length: totalPaginas }, (_, index) => (
+                            <button
+                                key={index}
+                                className={`pagination-btn ${paginaAtual === index ? 'active' : ''}`}
+                                onClick={() => setPaginaAtual(index)}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setPaginaAtual((prev) => Math.min(prev + 1, totalPaginas - 1))}
+                            disabled={paginaAtual >= totalPaginas - 1}
+                        >
+                            ›
+                        </button>
+
+                        <button
+                            className="pagination-btn"
+                            onClick={() => setPaginaAtual(totalPaginas - 1)}
+                            disabled={paginaAtual >= totalPaginas - 1 || totalPaginas === 0}
+                        >
+                            »
+                        </button>
+                    </div>
                 </div>
             )}
 

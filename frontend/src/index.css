@@ -90,6 +90,8 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 100;
+  transition: var(--transition);
+  transform: translateX(0);
 }
 
 .sidebar-logo {
@@ -318,6 +320,11 @@ body {
   font-size: 0.8rem;
 }
 
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none;
+}
+
 /* Forms */
 .form-group {
   margin-bottom: 1.25rem;
@@ -362,7 +369,8 @@ select.form-control {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .table {
@@ -577,17 +585,27 @@ select.form-control {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    flex-direction: row;
-    padding: 1rem;
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 1.25rem;
+    transform: translateX(-100%);
   }
   
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
   .sidebar-nav {
-    flex-direction: row;
-    overflow-x: auto;
+    flex-direction: column;
+    overflow-x: visible;
   }
   
   .main-content {
@@ -608,6 +626,25 @@ select.form-control {
     align-items: flex-start;
     gap: 1rem;
   }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .mobile-menu-btn svg {
+    font-size: 1.2rem;
+  }
 }
 
 /* Chart container */
@@ -625,10 +662,150 @@ select.form-control {
   color: var(--text-secondary);
 }
 
+/* Charts grid (dashboard) */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Toastify override */
 .Toastify__toast {
   background: var(--bg-card) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--border-radius-sm) !important;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: transparent;
+  box-shadow: var(--shadow-glow);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-ellipsis {
+  color: var(--text-muted);
+  padding: 0 0.25rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-info {
+    text-align: center;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+  }
+
+  .pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+  
+  .pagination-page-size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pagination-page-size label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .pagination-select {
+    width: auto;
+    min-width: 60px;
+    padding: 4px 8px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .pagination-page-size {
+    justify-content: center;
+  } 
+}
+
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pagination-controls {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
 }
