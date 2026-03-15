@@ -7,6 +7,8 @@ import br.com.fintrack.model.TipoTransacao;
 import br.com.fintrack.model.Transacao;
 import br.com.fintrack.repository.CategoriaRepository;
 import br.com.fintrack.repository.TransacaoRepository;
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -40,6 +42,7 @@ public class TransacaoService {
         return toDTO(transacao);
     }
 
+    @CacheInvalidateAll(cacheName = "resumo-financeiro")
     @Transactional
     public TransacaoDTO criar(TransacaoDTO dto) {
         validarTransacao(dto);
@@ -62,6 +65,7 @@ public class TransacaoService {
         return toDTO(transacao);
     }
 
+    @CacheInvalidateAll(cacheName = "resumo-financeiro")
     @Transactional
     public TransacaoDTO atualizar(Long id, TransacaoDTO dto) {
         Transacao transacao = transacaoRepository.findById(id);
@@ -89,6 +93,7 @@ public class TransacaoService {
         return toDTO(transacao);
     }
 
+    @CacheInvalidateAll(cacheName = "resumo-financeiro")
     @Transactional
     public void deletar(Long id) {
         Transacao transacao = transacaoRepository.findById(id);
@@ -112,7 +117,12 @@ public class TransacaoService {
                 .collect(Collectors.toList());
     }
 
+    
+    @CacheResult(cacheName = "resumo-financeiro")
     public ResumoFinanceiroDTO calcularResumo() {
+        
+        System.out.println("Calculando resumo no banco...");
+        
         List<Transacao> todas = transacaoRepository.listAll();
 
         BigDecimal totalReceitas = BigDecimal.ZERO;
