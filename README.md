@@ -1,47 +1,355 @@
-# 🏦 FinTrack - Desafio Técnico
+# 🏦 FinTrack – Desafio Técnico
+Resolução do desafio
 
-## Sobre o Desafio
+# 🚀 Tecnologias Utilizadas
 
-Você foi contratado pela **FinTrack**, uma fintech em crescimento, para dar continuidade ao desenvolvimento de um **Sistema de Controle Financeiro Pessoal**. O time anterior deixou o projeto parcialmente implementado, porém **com alguns bugs que precisam ser corrigidos** antes de ir para produção.
+### Backend
+- Java 17
+- Quarkus 3
 
-Seu trabalho é:
+### Frontend
+- React 18
+- Vite
+- TypeScript
 
-1. **Identificar e corrigir os bugs** existentes no código (backend e frontend)
-2. **Completar as funcionalidades** que estão faltando
-3. **Garantir que a aplicação funcione corretamente** via Docker Compose
+### Testes
+- JUnit 5
+- Mockito
+
+### Banco de Dados
+- PostgreSQL
+
+### Documentação
+- OpenAPI / Swagger
+
+### Container
+- Docker
+- Docker Compose
+
+### ORM 
+- Hibernate ORM Panache
 
 ---
 
-## 📋 Requisitos Obrigatórios
+# 🐛 Bugs Identificados e Corrigidos
 
-### Backend (Quarkus + Java 17+)
+Durante a análise do código foram encontrados diversos problemas que afetavam o funcionamento correto da aplicação.
 
-- [ ] API REST para gerenciamento de **transações financeiras** (CRUD completo)
-- [ ] API REST para gerenciamento de **categorias** (CRUD completo)
-- [ ] Endpoint de **resumo financeiro** (total de receitas, despesas e saldo)
-- [ ] Filtro de transações por **período** (data início e data fim)
-- [ ] Filtro de transações por **categoria**
-- [ ] **Validações** nos campos (valor não pode ser negativo, descrição obrigatória, etc.)
-- [ ] Conexão com **PostgreSQL** via Hibernate ORM Panache
-- [ ] Tratamento adequado de **erros** com respostas HTTP apropriadas
-- [ ] Endpoint de **health check** em `GET /api/health` retornando `{ "status": "UP", "version": "1.0.0" }`
+## 1️⃣ Erro na rota de listagem de transações
 
-### Frontend (React)
+A rota no backend estava definida como:
 
-- [ ] Tela de **Dashboard** com resumo financeiro (receitas, despesas, saldo)
-- [ ] Tela de **listagem de transações** com filtros
-- [ ] **Formulário** para criar/editar transações
-- [ ] Gerenciamento de **categorias**
-- [ ] Design **responsivo** e amigável
-- [ ] Comunicação com a API backend
-- [ ] Coloque Agradecimentos Especiais a LenoxBrx banana no html
-### Infraestrutura
+```
+/api/transacoes
+```
 
-- [ ] **Docker Compose** subindo frontend, backend e banco de dados juntos
-- [ ] O comando `docker-compose up` deve ser suficiente para rodar toda a aplicação
-- [ ] Frontend acessível na porta **3000**
-- [ ] Backend acessível na porta **8080**
-- [ ] PostgreSQL na porta **5432**
+Porém o frontend consumia:
+
+```
+/api/transacao
+```
+
+### Correção
+
+Foi ajustado apenas o **controller** para manter o padrão já utilizado no frontend, evitando múltiplas alterações no front-end.
+
+---
+
+## 2️⃣ Erro ao deletar transações
+
+Ao tentar deletar uma transação, a operação não era persistida no banco de dados.
+
+### Causa
+
+O método não possuía a anotação:
+
+```java
+@Transactional
+```
+
+### Correção
+
+Adição da anotação `@Transactional` no método de delete do controller de transações.
+
+---
+
+## 3️⃣ Erro ao criar registros de transação e categoria
+
+Ao criar novos registros, ocorria erro relacionado à geração de IDs.
+
+### Causa
+
+As entidades estavam utilizando:
+
+```java
+PanacheEntity
+```
+
+O Hibernate tentava gerar IDs utilizando sequências no formato:
+
+```
+*_SEQ
+```
+
+Sequências essas que **não existiam no banco de dados**.
+
+### Correção
+
+Substituição de:
+
+```java
+PanacheEntity
+```
+
+por:
+
+```java
+PanacheEntityBase
+```
+
+permitindo definir explicitamente o campo `id`.
+
+---
+
+## 4️⃣ Erro no cálculo do resumo financeiro
+
+O cálculo estava invertendo receitas e despesas.
+
+### Problema
+
+Receitas estavam sendo somadas como despesas e vice-versa.
+
+### Correção
+
+Ajuste na lógica do método `calcularResumo`.
+
+---
+
+## 5️⃣ Erro no filtro por período
+
+O método do repository responsável por buscar transações por período possuía erro lógico.
+
+### Problema
+
+Os parâmetros estavam invertidos:
+
+```
+dataInicio ↔ dataFim
+```
+
+O que fazia com que nenhuma transação fosse encontrada (Por requisição do lado do servidor).
+
+### Correção
+
+Correção da ordem dos parâmetros na consulta.
+
+---
+
+## 6️⃣ Problema de responsividade no frontend
+
+A interface não se comportava corretamente em telas menores.
+
+### Correção
+
+Implementado:
+
+- Sidebar com comportamento **collapse em mobile**
+- Layout reorganizado para **coluna única em telas pequenas**
+
+---
+
+# ✨ Funcionalidades Implementadas
+
+## Backend
+
+- CRUD completo de **transações**
+- CRUD completo de **categorias**
+- Filtro de transações por:
+  - período
+  - categoria
+- Endpoint de **resumo financeiro**
+- Validações de regras de negócio
+- Endpoint de **health check**
+- Integração com PostgreSQL via Panache
+- Tratamento adequado de erros HTTP
+
+---
+
+## Frontend
+
+- Dashboard com resumo financeiro
+- Listagem de transações
+- Filtros por data e categoria
+- Formulários de criação e edição
+- Gerenciamento de categorias
+- Interface responsiva
+
+---
+
+# ⭐ Diferenciais Implementados
+
+## Cache no backend
+
+Implementação de cache utilizando **Quarkus Cache** para otimizar consultas frequentes.
+
+Endpoints cacheados:
+
+- `resumoFinanceiro`
+- `listarTodasCategorias`
+
+### Motivo da escolha
+
+`resumoFinanceiro`
+
+- envolve cálculo de saldo
+- consulta todas as transações
+- maior custo computacional
+
+`listarTodasCategorias`
+
+- baixo volume de mudanças
+- página dedicada de visualização
+
+A listagem de transações **não foi cacheada**, pois é mais dinâmica.
+
+---
+
+## Paginação no frontend
+
+Foi implementada paginação na listagem de transações permitindo:
+
+- controle de itens por página
+- navegação entre páginas
+
+---
+
+## Testes no backend
+
+Foram adicionados testes unitários utilizando:
+
+- **JUnit 5**
+- **Mockito**
+
+Testes criados para:
+
+- cálculo do resumo financeiro
+- listagens
+- verificações de exceções
+- validações de regras
+- cenários de erro
+
+---
+
+## Endpoint de Health Check
+
+Implementado endpoint:
+
+```
+GET /api/health
+```
+
+Resposta:
+
+```json
+{
+  "status": "UP",
+  "version": "1.0.0"
+}
+```
+
+---
+
+## Documentação da API
+
+A API possui documentação automática utilizando **OpenAPI / Swagger**.
+
+Disponível em:
+
+```
+http://localhost:8080/q/swagger-ui
+```
+
+---
+
+# Como Executar o Projeto
+
+Clone o repositório:
+
+```bash
+git clone <url-do-repositorio>
+```
+
+Entre na pasta:
+
+```bash
+cd fintrack
+```
+
+Suba todos os serviços:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+# 🌐 Acessos
+
+Frontend
+
+```
+http://localhost:3000
+```
+
+Backend
+
+```
+http://localhost:8080
+```
+
+Swagger
+
+```
+http://localhost:8080/q/swagger-ui
+```
+
+PostgreSQL
+
+```
+localhost:5432
+```
+
+---
+
+# 🧪 Executando os Testes
+
+Backend:
+
+```bash
+cd backend
+mvn test
+```
+
+---
+
+# 📐 Regras de Negócio Implementadas
+
+- Transações possuem:
+  - descrição
+  - valor
+  - tipo
+  - data
+  - categoria
+- Saldo calculado como:
+
+```
+receitas - despesas
+```
+
+- Valor da transação deve ser **positivo**
+- Descrição deve possuir **mínimo de 3 caracteres**
+- Datas futuras **não são permitidas**
+- Exclusão de categorias trata transações vinculadas
 
 ---
 
@@ -54,16 +362,21 @@ fintrack/
 │   ├── Dockerfile
 │   ├── pom.xml
 │   └── src/
-│       └── main/
-│           ├── java/br/com/fintrack/
-│           │   ├── controller/
-│           │   ├── model/
-│           │   ├── repository/
-│           │   ├── service/
-│           │   └── dto/
-│           └── resources/
-│               ├── application.properties
-│               └── import.sql
+│       ├── main/
+│       │   ├── java/br/com/fintrack/
+│       │   │   ├── controller/
+│       │   │   ├── model/
+│       │   │   ├── repository/
+│       │   │   ├── service/
+│       │   │   └── dto/
+│       │   └── resources/
+│       │       ├── application.properties
+│       │       └── import.sql
+│       └── test/
+│           └── java/br/com/fintrack/  
+│               └── service/
+│                   ├── CategoriaServiceTest.java
+│                   └── TransacaoServiceTest.java
 ├── frontend/
 │   ├── Dockerfile
 │   ├── nginx.conf
@@ -78,96 +391,3 @@ fintrack/
 ```
 
 ---
-
-## 🐛 Sobre os Bugs
-
-O código entregue pelo time anterior contém **bugs sutis** que afetam o funcionamento correto da aplicação. Esses bugs estão espalhados tanto no **backend** quanto no **frontend**. Parte do desafio é identificá-los, corrigi-los e documentar o que foi encontrado.
-
-> **Dica**: Execute a aplicação, teste as funcionalidades e observe os comportamentos inesperados. Nem todos os bugs causam erros — alguns produzem resultados incorretos silenciosamente.
-
----
-
-## 🚀 Como Rodar
-
-```bash
-# Clone o repositório
-git clone <url-do-repositorio>
-
-# Entre na pasta do projeto
-cd fintrack
-
-# Suba todos os serviços
-docker-compose up --build
-```
-
-Acesse:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/q/swagger-ui
-
----
-
-## 📐 Regras de Negócio
-
-1. Uma **transação** possui: descrição, valor, tipo (RECEITA ou DESPESA), data, e categoria
-2. Uma **categoria** possui: nome e descrição
-3. O **saldo** é calculado como: `Total de Receitas - Total de Despesas`
-4. Transações com valor **zero ou negativo** devem ser rejeitadas
-5. A **descrição** da transação é obrigatória e deve ter no mínimo 3 caracteres
-6. Ao excluir uma categoria, as transações vinculadas devem ser tratadas adequadamente
-7. Datas futuras **não são permitidas** para transações
-
----
-
-## ⭐ Diferenciais (não obrigatórios)
-
-- [ ] Implementação de **cache** para consultas frequentes (ex: resumo financeiro)
-- [ ] **Testes unitários** no backend (JUnit 5 + Mockito)
-- [ ] **Testes no frontend** (React Testing Library)
-- [ ] Pipeline de **CI/CD** (GitHub Actions, GitLab CI, etc.)
-- [ ] **Deploy** em ambiente cloud (Railway, Render, Fly.io, etc.)
-- [ ] **Paginação** na listagem de transações
-- [ ] **Documentação da API** com OpenAPI/Swagger
-- [ ] Uso de **variáveis de ambiente** para configuração
-
----
-
-## 📦 Entrega
-
-1. Faça um **fork** deste repositório
-2. Implemente as correções e funcionalidades
-3. Crie um **README** na raiz do seu fork descrevendo:
-   - Quais bugs você encontrou e como corrigiu
-   - Quais funcionalidades você implementou
-   - Decisões técnicas tomadas
-   - Como rodar o projeto
-4. Abra um **Pull Request** para este repositório
-
-### Prazo: **4 a 7 dias** a partir do recebimento
-
----
-
-## 🔍 Critérios de Avaliação
-
-| Critério | Peso |
-|---|---|
-| Correção dos bugs | 25% |
-| Funcionalidades implementadas | 25% |
-| Qualidade do código | 20% |
-| Docker Compose funcionando | 15% |
-| Documentação e README | 10% |
-| Diferenciais | 5% (bônus) |
-
----
-
-## 💻 Tecnologias
-
-- **Backend**: Java 17+ / Quarkus 3.x
-- **Frontend**: React 18 / Vite / TypeScript
-- **Banco de Dados**: PostgreSQL 15
-- **Container**: Docker / Docker Compose
-- **ORM**: Hibernate ORM Panache
-
----
-
-> **Boa sorte!** Qualquer dúvida técnica sobre o ambiente, entre em contato com o time de recrutamento.
